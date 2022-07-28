@@ -15,7 +15,7 @@ from datetime import datetime
 class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        loadUi("./Assets/IR-Cam-GUI.ui",self)
+        loadUi("./Assets/GUI.ui",self)
 
         global dev
         dev = subprocess.getoutput("v4l2-ctl --list-devices | grep -A 2 'MikrOkularFullHD' | grep -m 1 /dev/video | sed -e 's/^\s*//'")
@@ -55,7 +55,7 @@ class MainWindow(QDialog):
             self.col_white.setEnabled(False)
 
     def browseFolders(self):
-        fname=QFileDialog.getExistingDirectory(self, "Select folder", os.environ['HOME']+"/Desktop/IR-Cam-Captures")
+        fname=QFileDialog.getExistingDirectory(self, "Select folder", os.environ['HOME']+"/Desktop/OcularCam-Captures")
         self.path.setText(fname)
 
     def startPreview(self):
@@ -106,7 +106,7 @@ class MainWindow(QDialog):
             abort = 1
         else:
             path = self.path.text()
-        
+
         if abort == 1:
             self.textOut.append("Not starting experiment, since one or more parameters are missing!")
             self.repeats.setEnabled(True)
@@ -123,7 +123,7 @@ class MainWindow(QDialog):
 
             self.textOut.append("Starting experiment")
             counter = int(0)
-        
+
             def handler():
                 nonlocal counter
                 counter += 1
@@ -137,7 +137,7 @@ class MainWindow(QDialog):
 
     def setScalebarColor(self, makeScale):
         self.textOut.append("Generating scale bars ...")
-        
+
         # strings to replace
         blackBar = []
         blackBar.append("style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:1.66669\"")
@@ -149,7 +149,7 @@ class MainWindow(QDialog):
         whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"M 22,1032.4772 H 218\" id=\"path1227\"/>")
         whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 21,1022.5 v 20\" id=\"path1227-9\"/>")
         whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 219,1022.5 v 20\" id=\"path1227-9-2\"/>")
-        
+
         # get svg path
         if makeScale == 1:
             svgPath = "./Assets/ScaleBar4x.svg"
@@ -157,7 +157,7 @@ class MainWindow(QDialog):
             svgPath = "./Assets/ScaleBar10x.svg"
         if makeScale == 3:
             svgPath = "./Assets/ScaleBar40x.svg"
-        
+
         # open the svg file as text
         f = open(svgPath, "rt")
         data = f.read()
@@ -172,14 +172,14 @@ class MainWindow(QDialog):
         if self.col_white.isChecked() == True:
             for n in range(0, len(whiteBar)):
                 data = data.replace(blackBar[n], whiteBar[n])   # replace all occurrences of the required string
-        
+
         # open the svg file in write mode
         f = open(svgPath, "wt")
         # overwrite the svg file with the resulting data
         f.write(data)
         # close the svg file
         f.close()
-        
+
         # get PNG path
         self.textOut.append("Loading scale bars ...")
         if makeScale == 1:
@@ -212,7 +212,7 @@ class MainWindow(QDialog):
             self.start.setEnabled(True)
             self.mag_label.setEnabled(True)
             self.mag.setEnabled(True)
-            
+
     def exit(self):
         sys.exit()
 

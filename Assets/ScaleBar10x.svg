@@ -40,7 +40,7 @@
   <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#FFFFFF;stroke-width:1.66669"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:1.66669"
        x="121.98083"
        y="1058.7437"
        id="text113"><tspan
@@ -51,9 +51,9 @@
          id="tspan273">40 µm</tspan></text>
     <g id="g1306" transform="matrix(1.31,0,0,1,-6.1991701,7.5)">
       <g id="g1360">
-        <path style="fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="M 22,1032.4772 H 218" id="path1227"/>
-        <path style="fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="m 21,1022.5 v 20" id="path1227-9"/>
-        <path style="fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="m 219,1022.5 v 20" id="path1227-9-2"/>
+        <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="M 22,1032.4772 H 218" id="path1227"/>
+        <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="m 21,1022.5 v 20" id="path1227-9"/>
+        <path style="fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1" d="m 219,1022.5 v 20" id="path1227-9-2"/>
       </g>
     </g>
   </g>
