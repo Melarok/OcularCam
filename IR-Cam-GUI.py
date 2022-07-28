@@ -37,7 +37,7 @@ class MainWindow(QDialog):
         self.start.clicked.connect(self.startCapture)
         self.quit.clicked.connect(self.exit)
 
-        self.mag.addItems(["-","4x","10x","100x"])
+        self.mag.addItems(["-","4x","10x","40x"])
         self.mag.setCurrentIndex(0)
 
         time.sleep(1.5)
@@ -156,7 +156,7 @@ class MainWindow(QDialog):
         if makeScale == 2:
             svgPath = "./Assets/ScaleBar10x.svg"
         if makeScale == 3:
-            svgPath = "./Assets/ScaleBar100x.svg"
+            svgPath = "./Assets/ScaleBar40x.svg"
         
         # open the svg file as text
         f = open(svgPath, "rt")
@@ -187,7 +187,7 @@ class MainWindow(QDialog):
         if makeScale == 2:
             pngPath = "./Assets/ScaleBar10x.png"
         if makeScale == 3:
-            pngPath = "./Assets/ScaleBar100x.png"
+            pngPath = "./Assets/ScaleBar40x.png"
 
         # convert the svg to png
         img = pyvips.Image.new_from_file(svgPath,dpi=72,scale=1)
