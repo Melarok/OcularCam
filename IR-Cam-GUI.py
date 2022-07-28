@@ -152,7 +152,7 @@ class MainWindow(QDialog):
         
         # get svg path
         if makeScale == 1:
-            svgPath = "./Assets/ScaleBar4x-test.svg"
+            svgPath = "./Assets/ScaleBar4x.svg"
         if makeScale == 2:
             svgPath = "./Assets/ScaleBar10x.svg"
         if makeScale == 3:
