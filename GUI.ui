@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>145</y>
+     <y>175</y>
      <width>75</width>
      <height>20</height>
     </rect>
@@ -52,8 +52,8 @@
    <property name="geometry">
     <rect>
      <x>95</x>
-     <y>140</y>
-     <width>225</width>
+     <y>170</y>
+     <width>235</width>
      <height>30</height>
     </rect>
    </property>
@@ -68,7 +68,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>50</y>
+     <y>65</y>
      <width>50</width>
      <height>30</height>
     </rect>
@@ -94,7 +94,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>55</y>
+     <y>70</y>
      <width>130</width>
      <height>20</height>
     </rect>
@@ -132,9 +132,9 @@
   <widget class="QPushButton" name="browse">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>140</y>
-     <width>60</width>
+     <x>340</x>
+     <y>170</y>
+     <width>50</width>
      <height>30</height>
     </rect>
    </property>
@@ -149,9 +149,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>189</y>
+     <y>220</y>
      <width>380</width>
-     <height>240</height>
+     <height>210</height>
     </rect>
    </property>
   </widget>
@@ -162,7 +162,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>90</y>
+     <y>120</y>
      <width>50</width>
      <height>30</height>
     </rect>
@@ -210,7 +210,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Insert scalebar</string>
+    <string>Insert scalebar                      </string>
    </property>
    <property name="checked">
     <bool>false</bool>
@@ -226,7 +226,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>95</y>
+     <y>125</y>
      <width>100</width>
      <height>20</height>
     </rect>
@@ -242,7 +242,7 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>60</y>
+     <y>55</y>
      <width>70</width>
      <height>20</height>
     </rect>
@@ -264,7 +264,7 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>90</y>
+     <y>85</y>
      <width>70</width>
      <height>20</height>
     </rect>
@@ -282,14 +282,66 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>75</y>
+     <x>210</x>
+     <y>70</y>
      <width>100</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>Scale bar color:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="posi">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>120</y>
+     <width>50</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <kerning>true</kerning>
+    </font>
+   </property>
+   <property name="editable">
+    <bool>false</bool>
+   </property>
+   <property name="currentText">
+    <string/>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+   </property>
+   <property name="placeholderText">
+    <string/>
+   </property>
+   <property name="frame">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="posi_label">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>125</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Scale bar position:</string>
    </property>
   </widget>
  </widget>

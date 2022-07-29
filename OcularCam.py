@@ -1,10 +1,10 @@
 #
-# package manager dependency: PyQt5 --> Arch: pyqt5 libvips; openSUSE: python-qt5 ?libvips?
-# pip dependencies: python-mpv Pillow pyvips
+# package manager dependency: PyQt5 --> Arch: pyqt5; openSUSE: python-qt5
+# pip dependencies: python-mpv Pillow
 #
 
-import mpv, time, sys, os, locale, subprocess, pyvips, PIL
-from PIL import Image
+import mpv, time, sys, os, locale, subprocess
+from PIL import Image, ImageDraw, ImageFont
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -19,44 +19,53 @@ class MainWindow(QDialog):
 
         global dev
         dev = subprocess.getoutput("v4l2-ctl --list-devices | grep -A 2 'MikrOkularFullHD' | grep -m 1 /dev/video | sed -e 's/^\s*//'")
-
+        
         if dev == "":
             self.textOut.append("Couldn't find ocular camera, using webcam instead")
             dev = "/dev/video0"
         else:
             self.textOut.append("Found ocular camera!")
-
         self.textOut.append("Using video input "+ dev)
-
+        
         self.startPreview()
         self.onlyInt = QIntValidator()
         self.interval.setValidator(self.onlyInt)
         self.repeats.setValidator(self.onlyInt)
         self.scalebar.stateChanged.connect(self.scalebarChanged)
         self.browse.clicked.connect(self.browseFolders)
-        self.start.clicked.connect(self.startCapture)
+        self.start.clicked.connect(self.prepare)
         self.quit.clicked.connect(self.exit)
-
         self.mag.addItems(["-","4x","10x","40x"])
         self.mag.setCurrentIndex(0)
-
+        self.posi.addItems(["TL","TR","BL","BR"])
+        self.posi.setCurrentIndex(2)
         time.sleep(1.5)
         self.activateWindow()
         self.show()
 
+
     def scalebarChanged(self):
+        global makeScale
         if self.scalebar.isChecked():
             self.col_label.setEnabled(True)
             self.col_black.setEnabled(True)
             self.col_white.setEnabled(True)
+            self.posi_label.setEnabled(True)
+            self.posi.setEnabled(True)
+            makeScale = self.mag.currentIndex()
         else:
             self.col_label.setEnabled(False)
             self.col_black.setEnabled(False)
             self.col_white.setEnabled(False)
+            self.posi_label.setEnabled(False)
+            self.posi.setEnabled(False)
+            makeScale = 0
+
 
     def browseFolders(self):
         fname=QFileDialog.getExistingDirectory(self, "Select folder", os.environ['HOME']+"/Desktop/OcularCam-Captures")
         self.path.setText(fname)
+
 
     def startPreview(self):
         locale.setlocale(locale.LC_NUMERIC, "C")
@@ -68,140 +77,118 @@ class MainWindow(QDialog):
         self.player.profile = "low-latency"
         self.player.untimed = True
         self.player.play(dev)
-        self.start.setEnabled(True)
 
-    def startCapture(self, counter):
+
+    def prepare(self):
+        abort = self.checkAbort()
+        if abort == 1:
+            self.textOut.append("Not starting experiment, since one or more parameters are missing!")
+        else:
+            self.prepareScalebar()
+            self.startExperiment()
+
+        
+    def checkAbort(self):
         self.start.setEnabled(False)
         self.repeats.setEnabled(False)
         self.interval.setEnabled(False)
         self.browse.setEnabled(False)
         self.mag_label.setEnabled(False)
         self.mag.setEnabled(False)
-
-        if self.scalebar.isChecked():
-            makeScale = self.mag.currentIndex()
-        else:
-            makeScale = 0
+        self.scalebar.setEnabled(False)
+        self.col_label.setEnabled(False)
+        self.col_black.setEnabled(False)
+        self.col_white.setEnabled(False)
+        self.posi_label.setEnabled(False)
+        self.posi.setEnabled(False)
 
         abort = 0
-
         try:
+            global repeats
             repeats = int(self.repeats.text())
         except:
             self.textOut.append("Error: Number of captures not provided!")
             abort = 1
-
         try:
+            global interval
             interval = int(self.interval.text()) * 1000
         except:
             self.textOut.append("Error: Interval not provided!")
             abort = 1
-
         if self.mag.currentIndex() == 0:
             self.textOut.append("Error: Magnification not provided!")
             abort = 1
-
         if os.path.exists(self.path.text()) != True:
             self.textOut.append("Error: Output path not provided!")
             abort = 1
         else:
+            global path
             path = self.path.text()
+        #if self.scalebar.isChecked() & interval == 1:
+        #    self.textOut.append("Error: Inserting the scalebar requires the interval to be >= 2 s")
+        #    abort = 1
 
         if abort == 1:
-            self.textOut.append("Not starting experiment, since one or more parameters are missing!")
             self.repeats.setEnabled(True)
             self.interval.setEnabled(True)
             self.browse.setEnabled(True)
             self.start.setEnabled(True)
             self.mag_label.setEnabled(True)
             self.mag.setEnabled(True)
-        else:
-            if makeScale != 0:
-                # set scalebar color and load it
-                pngPath = self.setScalebarColor(makeScale)
-                scalePng = Image.open(pngPath)
+            self.scalebar.setEnabled(True)
+            if self.scalebar.isChecked():
+                self.col_label.setEnabled(True)
+                self.col_black.setEnabled(True)
+                self.col_white.setEnabled(True)
+                self.posi_label.setEnabled(True)
+                self.posi.setEnabled(True)
+        return abort
 
-            self.textOut.append("Starting experiment")
-            counter = int(0)
 
-            def handler():
-                nonlocal counter
-                counter += 1
-                self.saveImage(counter, repeats, path, makeScale, scalePng)
-                if counter >= repeats:
-                    timer.stop()
-                    timer.deleteLater()
-            timer = QTimer()
-            timer.timeout.connect(handler)
-            timer.start(interval)
-
-    def setScalebarColor(self, makeScale):
-        self.textOut.append("Generating scale bars ...")
-
-        # strings to replace
-        blackBar = []
-        blackBar.append("style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;stroke-width:1.66669\"")
-        blackBar.append("<path style=\"fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"M 22,1032.4772 H 218\" id=\"path1227\"/>")
-        blackBar.append("<path style=\"fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 21,1022.5 v 20\" id=\"path1227-9\"/>")
-        blackBar.append("<path style=\"fill:#000000;stroke:#000000;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 219,1022.5 v 20\" id=\"path1227-9-2\"/>")
-        whiteBar = []
-        whiteBar.append("style=\"font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#FFFFFF;stroke-width:1.66669\"")
-        whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"M 22,1032.4772 H 218\" id=\"path1227\"/>")
-        whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 21,1022.5 v 20\" id=\"path1227-9\"/>")
-        whiteBar.append("<path style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:2;stroke-dasharray:none;stroke-opacity:1\" d=\"m 219,1022.5 v 20\" id=\"path1227-9-2\"/>")
-
-        # get svg path
-        if makeScale == 1:
-            svgPath = "./Assets/ScaleBar4x.svg"
-        if makeScale == 2:
-            svgPath = "./Assets/ScaleBar10x.svg"
-        if makeScale == 3:
-            svgPath = "./Assets/ScaleBar40x.svg"
-
-        # open the svg file as text
-        f = open(svgPath, "rt")
-        data = f.read()
-        # close the svg file
-        f.close()
-
-        # replace the strings
+    def prepareScalebar(self):
+        self.textOut.append("Preparing scale bar ...")
+        # set calibration and corresponding text
+        global calibration, cal_text, color, position
+        if self.mag.currentIndex() == 1:
+            calibration = 195
+            cal_text = "150 µm"
+        elif self.mag.currentIndex() == 2:
+            calibration = 262
+            cal_text = "40 µm"
+        elif self.mag.currentIndex() == 3:
+            calibration = 198
+            cal_text = "20 µm"
+        # set scale bar color
         if self.col_black.isChecked() == True:
-            for n in range(0, len(blackBar)):
-                data = data.replace(whiteBar[n], blackBar[n])   # replace all occurrences of the required string
+            color = (0, 0, 0, 255)
+        else:
+            color = (255, 255, 255, 255)
+        # set position
+        position = self.posi.currentIndex()
 
-        if self.col_white.isChecked() == True:
-            for n in range(0, len(whiteBar)):
-                data = data.replace(blackBar[n], whiteBar[n])   # replace all occurrences of the required string
 
-        # open the svg file in write mode
-        f = open(svgPath, "wt")
-        # overwrite the svg file with the resulting data
-        f.write(data)
-        # close the svg file
-        f.close()
+    def startExperiment(self):  
+        self.textOut.append("Starting experiment")
+        counter = int(0)
 
-        # get PNG path
-        self.textOut.append("Loading scale bars ...")
-        if makeScale == 1:
-            pngPath = "./Assets/ScaleBar4x.png"
-        if makeScale == 2:
-            pngPath = "./Assets/ScaleBar10x.png"
-        if makeScale == 3:
-            pngPath = "./Assets/ScaleBar40x.png"
+        def handler():
+            nonlocal counter
+            counter += 1
+            self.saveImage(counter)
+            if counter >= repeats:
+                timer.stop()
+                timer.deleteLater()
+        timer = QTimer()
+        timer.timeout.connect(handler)
+        timer.start(interval)
 
-        # convert the svg to png
-        img = pyvips.Image.new_from_file(svgPath,dpi=72,scale=1)
-        img.write_to_file(pngPath)
 
-        return pngPath
-
-    def saveImage(self, counter, repeats, path, makeScale, scalePng):
+    def saveImage(self, counter):
         self.textOut.append("Saving capture: "+str(counter)+" at time: "+str(datetime.now()))
         capture = self.player.screenshot_raw()
-        capture.save(f"{path}/Capture-{datetime.now()}.png", compress_level=0)
+        capture.save(f"{path}/Capture-{datetime.now()}.png", compress_level=1)
         if makeScale != 0:
-            capture.paste(scalePng, (0,0), scalePng)
-            capture.save(f"{path}/Capture-withScale-{datetime.now()}.png", compress_level=0)
+            self.insertScalebar(capture)
 
         self.textOut.append("Capture "+str(counter)+" complete!")
         if counter >= repeats:
@@ -212,6 +199,53 @@ class MainWindow(QDialog):
             self.start.setEnabled(True)
             self.mag_label.setEnabled(True)
             self.mag.setEnabled(True)
+            self.scalebar.setEnabled(True)
+            if self.scalebar.isChecked():
+                self.col_label.setEnabled(True)
+                self.col_black.setEnabled(True)
+                self.col_white.setEnabled(True)
+                self.posi_label.setEnabled(True)
+                self.posi.setEnabled(True)
+
+
+    def insertScalebar(self, capture):
+        img_w, img_h = capture.size
+        font = ImageFont.truetype('/usr/share/fonts/noto/NotoSans-Regular.ttf', 20)
+        text_l, text_t, text_w, text_h = font.getbbox(cal_text, anchor="lt")
+        margin = 20
+        line_w = 2
+        side_length = 20
+        # position scale bar in desired corner
+        if position == 0:
+            offsetX = 0
+            offsetY = 0
+        elif position == 1:
+            offsetX = img_w - margin*2 - calibration
+            offsetY = 0
+        elif position == 2:
+            offsetX = 0
+            offsetY = img_h - margin*2 - text_h - 5
+        elif position == 3:
+            offsetX = img_w - margin*2 - calibration
+            offsetY = img_h - margin*2 - text_h - 5
+        # calculate the x,y coordinates of the bars and text
+        side1_xy1 = ((offsetX + margin),(offsetY + margin))
+        side1_xy2 = ((offsetX + margin),(offsetY + margin + side_length))
+        side2_xy1 = ((offsetX + margin + calibration),(offsetY + margin))
+        side2_xy2 = ((offsetX + margin + calibration),(offsetY + margin + side_length))
+        bar_xy1 = ((offsetX + margin),(offsetY + margin + (side_length/2)))
+        bar_xy2 = ((offsetX + margin + calibration),(offsetY + margin + (side_length/2)))
+        txt_xy = ((offsetX + margin + (calibration/2)),(offsetY + margin + side_length))
+        # draw the scalebar
+        draw = ImageDraw.Draw(capture)
+        draw.line([side1_xy1,side1_xy2], width=line_w, fill=color)
+        draw.line([side2_xy1,side2_xy2], width=line_w, fill=color)
+        draw.line([bar_xy1,bar_xy2], width=line_w, fill=color)
+        draw.text((txt_xy), cal_text, font=font, align="center", anchor="mt", fill=color)
+        # save the image
+        self.textOut.append("Saving with scale bar")
+        capture.save(f"{path}/Capture-withScale-{datetime.now()}.png", compress_level=1)
+
 
     def exit(self):
         sys.exit()
