@@ -90,8 +90,11 @@ class MainWindow(QDialog):
         
     def checkAbort(self):
         self.start.setEnabled(False)
+        self.repeats_label.setEnabled(False)
         self.repeats.setEnabled(False)
+        self.interval_label.setEnabled(False)
         self.interval.setEnabled(False)
+        self.path_label.setEnabled(False)            
         self.browse.setEnabled(False)
         self.mag_label.setEnabled(False)
         self.mag.setEnabled(False)
@@ -129,10 +132,13 @@ class MainWindow(QDialog):
         #    abort = 1
 
         if abort == 1:
-            self.repeats.setEnabled(True)
-            self.interval.setEnabled(True)
-            self.browse.setEnabled(True)
             self.start.setEnabled(True)
+            self.repeats_label.setEnabled(True)
+            self.repeats.setEnabled(True)
+            self.interval_label.setEnabled(True)
+            self.interval.setEnabled(True)
+            self.path_label.setEnabled(True)
+            self.browse.setEnabled(True)
             self.mag_label.setEnabled(True)
             self.mag.setEnabled(True)
             self.scalebar.setEnabled(True)
@@ -193,10 +199,13 @@ class MainWindow(QDialog):
         self.textOut.append("Capture "+str(counter)+" complete!")
         if counter >= repeats:
             self.textOut.append("Experiment complete!")
-            self.repeats.setEnabled(True)
-            self.interval.setEnabled(True)
-            self.browse.setEnabled(True)
             self.start.setEnabled(True)
+            self.repeats_label.setEnabled(True)
+            self.repeats.setEnabled(True)
+            self.interval_label.setEnabled(True)
+            self.interval.setEnabled(True)
+            self.path_label.setEnabled(True)
+            self.browse.setEnabled(True)
             self.mag_label.setEnabled(True)
             self.mag.setEnabled(True)
             self.scalebar.setEnabled(True)
