@@ -15,7 +15,7 @@ from datetime import datetime
 class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        loadUi("./Assets/GUI.ui",self)
+        loadUi("GUI.ui",self)
 
         global dev
         dev = subprocess.getoutput("v4l2-ctl --list-devices | grep -A 2 'MikrOkularFullHD' | grep -m 1 /dev/video | sed -e 's/^\s*//'")
